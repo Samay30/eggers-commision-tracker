@@ -1,0 +1,22 @@
+# Local development database only. The app itself deploys to Vercel.
+# Start it with:  docker compose up -d db
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: commission
+      POSTGRES_PASSWORD: commission_dev_password
+      POSTGRES_DB: commission_tracker
+    ports:
+      - "5432:5432"
+    volumes:
+      - commission_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U commission -d commission_tracker"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  commission_pgdata:

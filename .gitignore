@@ -1,0 +1,17 @@
+node_modules
+.next
+.env
+.env*.local
+coverage
+dist
+.DS_Store
+*.log
+prisma/dev.db
+uploads
+*.xlsx
+
+# vercel
+.vercel
+
+# typescript build info
+*.tsbuildinfo

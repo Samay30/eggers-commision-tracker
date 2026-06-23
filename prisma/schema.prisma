@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Pooled connection used at runtime (serverless-safe).
+  url       = env("DATABASE_URL")
+  // Direct (non-pooled) connection used only for migrations.
+  // On Vercel Postgres/Neon, set this to the unpooled connection string.
+  directUrl = env("DIRECT_URL")
+}
+
+enum Role {
+  ADMIN
+  OWNER
+  RECRUITER
+}
+
+enum PayFrequency {
+  SEMI_MONTHLY
+  BI_WEEKLY
+  MONTHLY
+}
+
+enum PlacementStatus {
+  PENDING
+  PAID
+  CANCELED
+}
+
+enum AdjustmentKind {
+  COMMISSION
+  DRAW
+  PAYOUT
+  MANUAL
+}
+
+enum WebhookStatus {
+  RECEIVED
+  PROCESSED
+  FAILED
+  DUPLICATE
+}
+
+model User {
+  id               String      @id @default(cuid())
+  email            String      @unique
+  name             String
+  role             Role        @default(RECRUITER)
+  passwordHash     String
+  isActive         Boolean     @default(true)
+  recruiterProfile Recruiter?
+  createdPlacements Placement[] @relation("CreatedPlacements")
+  createdAdjustments Adjustment[] @relation("CreatedAdjustments")
+  auditLogs        AuditLog[]  @relation("ActorAuditLogs")
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+}
+
+model Recruiter {
+  id          String           @id @default(cuid())
+  userId      String?          @unique
+  user        User?            @relation(fields: [userId], references: [id], onDelete: SetNull)
+  displayName String
+  active      Boolean          @default(true)
+  startDate   DateTime?
+  plans       CommissionPlan[]
+  placements  Placement[]
+  adjustments Adjustment[]
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+
+  @@index([displayName])
+}
+
+model CommissionPlan {
+  id                 String       @id @default(cuid())
+  recruiterId        String
+  recruiter          Recruiter    @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  year               Int
+  annualGoal         Decimal      @db.Decimal(14, 2)
+  commissionRate     Decimal      @db.Decimal(8, 6)
+  salaryPerPayPeriod Decimal      @db.Decimal(14, 2)
+  payFrequency       PayFrequency @default(SEMI_MONTHLY)
+  monthlyPayoutRate  Decimal      @default(0.90) @db.Decimal(8, 6)
+  quarterlyTrueUp    Boolean      @default(true)
+  openingBalance     Decimal      @default(0) @db.Decimal(14, 2)
+  notes              String?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  @@unique([recruiterId, year])
+  @@index([year])
+}
+
+model Placement {
+  id             String          @id @default(cuid())
+  recruiterId    String
+  recruiter      Recruiter       @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  externalSource String?
+  externalId     String?
+  placementName  String
+  clientName     String?
+  candidateName  String?
+  paymentDate    DateTime
+  startDate      DateTime?
+  payDate        DateTime?
+  billAmount     Decimal         @db.Decimal(14, 2)
+  payoutOverride Decimal?        @db.Decimal(14, 2)
+  status         PlacementStatus @default(PENDING)
+  noteCiphertext String?
+  noteIv         String?
+  noteAuthTag    String?
+  metadata       Json?
+  createdById    String?
+  createdBy      User?           @relation("CreatedPlacements", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+
+  @@unique([externalSource, externalId])
+  @@index([recruiterId, paymentDate])
+  @@index([status])
+}
+
+model Adjustment {
+  id             String         @id @default(cuid())
+  recruiterId    String
+  recruiter      Recruiter      @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  effectiveDate  DateTime
+  amount         Decimal        @db.Decimal(14, 2)
+  kind           AdjustmentKind
+  reasonCiphertext String?
+  reasonIv       String?
+  reasonAuthTag  String?
+  createdById    String?
+  createdBy      User?          @relation("CreatedAdjustments", fields: [createdById], references: [id], onDelete: SetNull)
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([recruiterId, effectiveDate])
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  actorUserId String?
+  actor       User?    @relation("ActorAuditLogs", fields: [actorUserId], references: [id], onDelete: SetNull)
+  action      String
+  entityType  String
+  entityId    String?
+  metadata    Json?
+  ipAddress   String?
+  createdAt   DateTime @default(now())
+
+  @@index([actorUserId, createdAt])
+  @@index([entityType, entityId])
+}
+
+model WebhookEvent {
+  id          String        @id @default(cuid())
+  source      String
+  externalId  String?
+  payloadHash String
+  status      WebhookStatus @default(RECEIVED)
+  error       String?
+  processedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@unique([source, externalId])
+  @@index([createdAt])
+}
