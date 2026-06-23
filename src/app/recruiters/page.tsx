@@ -1,8 +1,9 @@
 import Link from 'next/link';
 import { AppShell } from '@/components/AppShell';
+import { ConfirmSubmit } from '@/components/ConfirmSubmit';
 import { requireUser, isAdminLike } from '@/lib/auth';
 import { getAccessibleRecruiters } from '@/lib/data';
-import { createRecruiterAction } from '@/app/actions';
+import { createRecruiterAction, setRecruiterStatusAction } from '@/app/actions';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,16 +19,16 @@ export default async function RecruitersPage() {
         <div>
           <p className="eyebrow">Private recruiter records</p>
           <h1>Recruiters</h1>
-          <p>Each recruiter has their own plan, placements, draw balance, and annual goal progress.</p>
+          <p>Each recruiter has their own plan, placements, draw balance, and annual goal progress. Click a name to open and edit their ledger.</p>
         </div>
       </div>
 
       <div className="grid two">
         <div className="card">
-          <h2>Current recruiters</h2>
+          <h2>Recruiters</h2>
           <div className="table-wrap">
             <table>
-              <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th></tr></thead>
+              <thead><tr><th>Name</th><th>Email</th><th>Plan</th><th>Status</th>{admin ? <th></th> : null}</tr></thead>
               <tbody>
                 {recruiters.map((recruiter) => (
                   <tr key={recruiter.id}>
@@ -35,6 +36,23 @@ export default async function RecruitersPage() {
                     <td>{recruiter.user?.email ?? 'No login attached'}</td>
                     <td>{recruiter.plans[0] ? `${recruiter.plans[0].year}` : 'Not configured'}</td>
                     <td>{recruiter.active ? <span className="badge green">Active</span> : <span className="badge gray">Inactive</span>}</td>
+                    {admin ? (
+                      <td>
+                        {recruiter.active ? (
+                          <form action={setRecruiterStatusAction}>
+                            <input type="hidden" name="recruiterId" value={recruiter.id} />
+                            <input type="hidden" name="active" value="false" />
+                            <ConfirmSubmit className="button secondary" message={`Deactivate ${recruiter.displayName}? Their login will be disabled.`}>Deactivate</ConfirmSubmit>
+                          </form>
+                        ) : (
+                          <form action={setRecruiterStatusAction}>
+                            <input type="hidden" name="recruiterId" value={recruiter.id} />
+                            <input type="hidden" name="active" value="true" />
+                            <button className="button" type="submit">Reactivate</button>
+                          </form>
+                        )}
+                      </td>
+                    ) : null}
                   </tr>
                 ))}
               </tbody>
@@ -45,7 +63,7 @@ export default async function RecruitersPage() {
         {admin ? (
           <div className="card">
             <h2>Add recruiter/login</h2>
-            <p>This creates a login and, for recruiter role, a linked recruiter profile. Use a temporary password and change it after first sign-in.</p>
+            <p>This creates a login and, for recruiter role, a linked recruiter profile. Use a temporary password and have them change it after first sign-in.</p>
             <form className="form" action={createRecruiterAction}>
               <label>Name<input name="name" required /></label>
               <label>Email<input name="email" type="email" required /></label>
