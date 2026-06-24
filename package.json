@@ -16,6 +16,8 @@
     "db:migrate": "prisma migrate deploy",
     "db:dev": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts", 
+    "onboard": "tsx scripts/onboard.ts",
+    "loxo:inspect": "tsx scripts/loxo-inspect.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },

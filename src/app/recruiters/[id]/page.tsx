@@ -236,7 +236,7 @@ export default async function RecruiterDetailPage({
         <p>Only PAID placements flow into commission earned. {canEditPlacement ? 'You can add, edit, and correct placements here.' : 'Read-only.'}</p>
         <div className="table-wrap">
           <table>
-            <thead><tr><th>Placement</th><th>Payment date</th><th>Status</th><th className="num">Bill</th><th className="num">Override</th><th></th></tr></thead>
+            <thead><tr><th>Placement</th><th>Payment date</th><th>Status</th><th className="num">Bill</th><th>Fee basis</th><th></th></tr></thead>
             <tbody>
               {placements.length === 0 ? (
                 <tr><td colSpan={6}><span className="kpi-sub">No placements recorded for {year}.</span></td></tr>
@@ -247,7 +247,16 @@ export default async function RecruiterDetailPage({
                   <td>{toIsoDate(placement.paymentDate)}</td>
                   <td><StatusBadge status={placement.status} /></td>
                   <td className="num">{currency(Number(placement.billAmount))}</td>
-                  <td className="num">{placement.payoutOverride ? currency(Number(placement.payoutOverride)) : '—'}</td>
+                  <td>{(() => {
+                    const meta = (placement.metadata as Record<string, unknown> | null) ?? {};
+                    const summary = (meta.feeSummary as string) || (meta.feeType as string) || (placement.payoutOverride ? 'Override' : '—');
+                    return (
+                      <>
+                        {summary}
+                        {meta.needsReview ? <><br /><span className="badge yellow">Needs review</span></> : null}
+                      </>
+                    );
+                  })()}</td>
                   <td>
                     {canEditPlacement || canDeletePlacement ? (
                       <details>

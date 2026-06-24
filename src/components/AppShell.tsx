@@ -11,6 +11,7 @@ export function AppShell({ user, children }: { user: CurrentUser; children: Reac
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/recruiters">Recruiters</Link>
           <Link href="/placements">Placements</Link>
+          {isAdminLike(user.role) ? <Link href="/integrations">Integrations</Link> : null}
           {isAdminLike(user.role) ? <Link href="/audit">Audit log</Link> : null}
           <Link href="/settings">Settings</Link>
           <form action="/api/auth/logout" method="post">
