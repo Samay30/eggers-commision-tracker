@@ -6,7 +6,7 @@ export function AppShell({ user, children }: { user: CurrentUser; children: Reac
   return (
     <div className="shell">
       <aside className="sidebar">
-        <div className="brand">Commission Tracker</div>
+        <div className="brand">The Eggers Hub</div>
         <nav className="nav">
           <Link href="/hub">Hub</Link>
           <Link href="/dashboard">Dashboard</Link>

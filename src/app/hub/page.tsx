@@ -15,7 +15,7 @@ export default async function HubPage() {
       <div className="page-head">
         <div>
           <p className="eyebrow">Home</p>
-          <h1>Hub</h1>
+          <h1>The Eggers Hub</h1>
           <p>Your dashboard, plus quick links to the tools we already use. One place to start the day.</p>
         </div>
       </div>

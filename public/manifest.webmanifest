@@ -1,6 +1,6 @@
 {
-  "name": "Eggers Commission Tracker",
-  "short_name": "EES",
+  "name": "The Eggers Hub",
+  "short_name": "Eggers Hub",
   "description": "Live billing, interview, and phone-time goals for the Eggers team.",
   "start_url": "/hub",
   "scope": "/",

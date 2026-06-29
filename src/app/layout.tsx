@@ -3,13 +3,13 @@ import './globals.css';
 import { ServiceWorkerRegister } from '@/components/ServiceWorkerRegister';
 
 export const metadata: Metadata = {
-  title: 'Eggers Commission Tracker',
-  description: 'Live billing, interview, and phone-time goals for the Eggers team.',
+  title: 'The Eggers Hub',
+  description: 'Live goals, billing, and activity for the Eggers team.',
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'EES'
+    title: 'Eggers Hub'
   },
   icons: {
     icon: '/icons/icon-192.png',
