@@ -5,8 +5,8 @@
     LOXO_API_KEY=<your Loxo API key>            # ROTATE the one shared in chat first
     LOXO_AGENCY_SLUG=eggers-executive-search
     LOXO_DOMAIN=app.loxo.co
-    LOXO_WEBHOOK_SECRET=c3ee54394894e3ec9a981871059de0e8cd8690b21b48b166546bf8bf5e4b5d43
-    LOXO_SYNC_SECRET=d81905f650601b6276ca0a46e36a05355b3a6a398eeb893f
+    LOXO_WEBHOOK_SECRET=<generate-a-random-hex-string>
+    LOXO_SYNC_SECRET=<generate-a-random-hex-string>
     # Optional fallback if a placement has no matching recruiter email:
     # DEFAULT_LOXO_RECRUITER_ID=<recruiter id>
     # Optional override if placements aren't at /placements (inspect script tells you):
@@ -41,7 +41,7 @@ Match the printed keys to the lists in src/lib/loxo/mapping.ts. Adjust if needed
 
 ## 4. Onboard the team
 
-    JASON_INITIAL_PASSWORD='Roscoe@70' npm run onboard
+    JASON_INITIAL_PASSWORD='<set-a-temporary-password>' npm run onboard
 
 Prints each person's temporary password once. VERIFY the emails in scripts/onboard.ts
 first — the login email must match each person's Loxo email or their placements won't

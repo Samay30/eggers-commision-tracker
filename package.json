@@ -15,7 +15,7 @@
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate deploy",
     "db:dev": "prisma migrate dev",
-    "db:seed": "tsx prisma/seed.ts", 
+    "db:seed": "tsx prisma/seed.ts",
     "onboard": "tsx scripts/onboard.ts",
     "loxo:inspect": "tsx scripts/loxo-inspect.ts",
     "test": "vitest run",
@@ -24,6 +24,7 @@
   "dependencies": {
     "@prisma/client": "^6.9.0",
     "bcryptjs": "^3.0.2",
+    "client": "^0.0.1",
     "next": "^15.3.3",
     "prisma": "^6.9.0",
     "react": "^19.0.0",

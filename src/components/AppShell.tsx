@@ -8,9 +8,11 @@ export function AppShell({ user, children }: { user: CurrentUser; children: Reac
       <aside className="sidebar">
         <div className="brand">Commission Tracker</div>
         <nav className="nav">
+          <Link href="/hub">Hub</Link>
           <Link href="/dashboard">Dashboard</Link>
           <Link href="/recruiters">Recruiters</Link>
           <Link href="/placements">Placements</Link>
+          {isAdminLike(user.role) ? <Link href="/goals">Goals</Link> : null}
           {isAdminLike(user.role) ? <Link href="/integrations">Integrations</Link> : null}
           {isAdminLike(user.role) ? <Link href="/audit">Audit log</Link> : null}
           <Link href="/settings">Settings</Link>

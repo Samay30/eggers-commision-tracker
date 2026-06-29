@@ -68,6 +68,9 @@ model Recruiter {
   plans       CommissionPlan[]
   placements  Placement[]
   adjustments Adjustment[]
+  activityTargets ActivityTarget[]
+  callDays    CallActivityDay[]
+  interviewDays InterviewActivityDay[]
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
 
@@ -168,4 +171,71 @@ model WebhookEvent {
 
   @@unique([source, externalId])
   @@index([createdAt])
+}
+
+// ============================================================================
+//  Goals + activity (added for the company/team/individual goal dashboard)
+// ============================================================================
+
+/// Company-wide annual goals. One row per year. Billing goal is the firm's
+/// annual billing target; phone/interview goals are the rolled-up activity
+/// targets. Individual billing goals continue to live on CommissionPlan.annualGoal.
+model OrgGoal {
+  id              String   @id @default(cuid())
+  year            Int      @unique
+  billingGoal     Decimal  @default(0) @db.Decimal(14, 2)
+  interviewGoal   Int      @default(0)
+  phoneMinutesGoal Int     @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+/// Per-recruiter annual activity targets (phone + interviews). Billing target
+/// stays on CommissionPlan so the commission engine remains the source of truth
+/// for money; this model only holds activity KPIs.
+model ActivityTarget {
+  id              String   @id @default(cuid())
+  recruiterId     String
+  recruiter       Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  year            Int
+  interviewGoal   Int      @default(0)
+  phoneMinutesGoal Int     @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([recruiterId, year])
+  @@index([year])
+}
+
+/// One row per recruiter per day of phone activity, synced from Ringover.
+/// Idempotent upsert on (recruiterId, date) keeps re-syncs clean.
+model CallActivityDay {
+  id           String    @id @default(cuid())
+  recruiterId  String
+  recruiter    Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  date         DateTime  @db.Date
+  totalCalls   Int       @default(0)
+  outboundCalls Int      @default(0)
+  talkSeconds  Int       @default(0)
+  source       String    @default("ringover")
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  @@unique([recruiterId, date])
+  @@index([date])
+}
+
+/// One row per recruiter per day of interview activity, synced from Loxo.
+model InterviewActivityDay {
+  id          String    @id @default(cuid())
+  recruiterId String
+  recruiter   Recruiter @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  date        DateTime  @db.Date
+  interviews  Int       @default(0)
+  source      String    @default("loxo")
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([recruiterId, date])
+  @@index([date])
 }

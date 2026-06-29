@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "crons": [
+    { "path": "/api/activity/sync", "schedule": "0 * * * *" }
+  ],
+  "functions": {
+    "src/app/api/activity/sync/route.ts": { "maxDuration": 60 },
+    "src/app/api/loxo/sync/route.ts": { "maxDuration": 60 }
+  }
+}
