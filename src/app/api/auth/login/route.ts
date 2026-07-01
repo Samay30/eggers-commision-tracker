@@ -21,7 +21,8 @@ export async function POST(request: Request) {
   const password = String(form.get('password') || '');
 
   const user = await prisma.user.findUnique({ where: { email } });
-  const ok = user && user.isActive ? await bcrypt.compare(password, user.passwordHash) : false;
+  const ok =
+    user && user.isActive && user.passwordHash ? await bcrypt.compare(password, user.passwordHash) : false;
 
   if (!user || !ok) {
     await auditLog({ action: 'LOGIN_FAILED', entityType: 'User', entityId: null, metadata: { email } });
@@ -29,6 +30,6 @@ export async function POST(request: Request) {
   }
 
   await createSessionCookie(user.id, user.role);
-  await auditLog({ actorUserId: user.id, action: 'LOGIN_SUCCESS', entityType: 'User', entityId: user.id });
+  await auditLog({ actorUserId: user.id, action: 'LOGIN_SUCCESS', entityType: 'User', entityId: user.id, metadata: { provider: 'password' } });
   return NextResponse.redirect(new URL('/dashboard', request.url), { status: 303 });
 }

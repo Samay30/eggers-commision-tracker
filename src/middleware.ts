@@ -4,6 +4,8 @@ import { sessionCookieName } from '@/lib/session-cookie';
 const PUBLIC_PATHS = [
   '/login',
   '/api/auth/login',
+  '/api/auth/entra/login',
+  '/api/auth/entra/callback',
   '/api/health',
   '/api/loxo/webhook',
   '/api/activity/sync',

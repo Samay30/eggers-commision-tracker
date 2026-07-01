@@ -615,8 +615,8 @@ export async function changeOwnPasswordAction(formData: FormData) {
   const dbUser = await prisma.user.findUnique({ where: { id: actor.id } });
   if (!dbUser) throw new Error('Account not found.');
 
-  const ok = await bcrypt.compare(parsed.currentPassword, dbUser.passwordHash);
-  if (!ok) throw new Error('Your current password is incorrect.');
+  const ok = dbUser.passwordHash ? await bcrypt.compare(parsed.currentPassword, dbUser.passwordHash) : true;
+  if (dbUser.passwordHash && !ok) throw new Error('Your current password is incorrect.');
 
   const passwordHash = await bcrypt.hash(parsed.newPassword, 12);
   await prisma.user.update({ where: { id: actor.id }, data: { passwordHash } });

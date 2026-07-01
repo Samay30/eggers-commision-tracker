@@ -17,6 +17,11 @@ enum Role {
   RECRUITER
 }
 
+enum AuthProvider {
+  PASSWORD
+  ENTRA
+}
+
 enum PayFrequency {
   SEMI_MONTHLY
   BI_WEEKLY
@@ -48,7 +53,9 @@ model User {
   email            String      @unique
   name             String
   role             Role        @default(RECRUITER)
-  passwordHash     String
+  passwordHash     String?
+  authProvider     AuthProvider @default(PASSWORD)
+  entraId          String?     @unique
   isActive         Boolean     @default(true)
   recruiterProfile Recruiter?
   createdPlacements Placement[] @relation("CreatedPlacements")
