@@ -12,6 +12,10 @@ export interface HubLink {
 
 const env = (key: string, fallback: string) => process.env[key]?.trim() || fallback;
 
+// Microsoft's built-in Approvals app inside Teams. This app ID is the same
+// across every Microsoft 365 tenant — it's Microsoft's app, not ours.
+const TEAMS_APPROVALS_LINK = 'https://teams.microsoft.com/l/entity/7c316234-ded0-4f95-8a83-8453d0876592/approvals';
+
 export const HUB_LINKS: HubLink[] = [
   {
     title: 'Company news & policies',
@@ -46,13 +50,13 @@ export const HUB_LINKS: HubLink[] = [
   {
     title: 'PTO & approvals',
     description: 'Request time off and approve requests.',
-    href: env('LINK_PTO', 'https://approvals.teams.microsoft.com'),
+    href: env('LINK_PTO', TEAMS_APPROVALS_LINK),
     group: 'People'
   },
   {
     title: 'Expenses',
     description: 'Submit and approve expenses.',
-    href: env('LINK_EXPENSES', 'https://approvals.teams.microsoft.com'),
+    href: env('LINK_EXPENSES', TEAMS_APPROVALS_LINK),
     group: 'People'
   },
   {
